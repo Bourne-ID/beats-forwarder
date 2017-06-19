@@ -41,8 +41,8 @@ input:
 
 output:
 
-    # The wanted output (syslog|udp_tcp|http|logmatic), by default syslog
-  type: ${BFWD_OUTPUT_TYPE:syslog}
+    # The wanted output (syslog|udp_tcp|http|httpgelf|logmatic), by default syslog
+  type: ${BFWD_OUTPUT_TYPE:httpgelf}
 
   # UDP and TCP settings
   udp_tcp:
@@ -93,6 +93,13 @@ output:
 
   # HTTP specific settings
   http:
+
+    # The remote endpoint
+    endpoint: ${BFWD_HTTP_ENDPOINT}
+
+
+  # HTTP specific settings
+  httpgelf:
 
     # The remote endpoint
     endpoint: ${BFWD_HTTP_ENDPOINT}
