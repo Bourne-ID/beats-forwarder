@@ -1,5 +1,6 @@
 # beats-forwarder
 A simple forwarder to send beats everywhere through udp, tcp, syslog and third-party
+This fork includes GELF-HTTP, implemented with reference to the method that is used to import beats in the Graylog-Plugin-Beats-2.2.3 plugin. 
 
 ## Quick and dirty: send beats to Logmatic.io
 ```sh
