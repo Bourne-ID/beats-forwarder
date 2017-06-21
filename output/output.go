@@ -3,7 +3,7 @@ package output
 import cfg "github.com/Bourne-ID/beats-forwarder/config"
 
 // Interface that all outputs should be implemented
-type Output  interface {
+type Output interface {
 	Init(*cfg.Config) error
 	Connect() error
 	WriteAndRetry([]byte) error

@@ -1,27 +1,26 @@
 package main
 
 import (
-	"os"
-	"github.com/Bourne-ID/beats-forwarder/forwarder"
-	cfg "github.com/Bourne-ID/beats-forwarder/config"
-	"github.com/Sirupsen/logrus"
 	"flag"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
+	"github.com/Bourne-ID/beats-forwarder/forwarder"
+	"github.com/Sirupsen/logrus"
+	"os"
 )
 
 var config = cfg.Config{}
 
 func main() {
 
-
 	flag.Parse()
 	debug := flag.Lookup("d").Value.String()
 
-	if (debug == "true") {
+	if debug == "true" {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	// read the configuration
-	err := cfg.Read(&config, "")
+	err := cfg.Read(&config)
 	if err != nil {
 		logrus.Fatal(err)
 		os.Exit(1)

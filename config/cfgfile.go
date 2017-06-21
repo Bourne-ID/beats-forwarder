@@ -21,17 +21,17 @@ func init() {
 
 }
 
-func Read(out interface{}, path string) error {
+func Read(out interface{}) error {
 
 	// default config
 	err := internalRead(out, "etc/config.yml")
-	if (err!=nil){
+	if err != nil {
 		return err
 	}
 	// user-override
-	if (*configfile != flag.Lookup("c").DefValue) {
+	if *configfile != flag.Lookup("c").DefValue {
 		err := internalRead(out, "")
-		if (err!=nil){
+		if err != nil {
 			return err
 		}
 	}
@@ -65,7 +65,6 @@ func internalRead(out interface{}, path string) error {
 	return nil
 }
 
-
 // expandEnv replaces ${var} or $var in config according to the values of the
 // current environment variables. The replacement is case-sensitive. References
 // to undefined variables are replaced by the empty string. A default value
@@ -79,7 +78,7 @@ func expandEnv(config []byte) []byte {
 		if v == "" && len(keyAndDefault) == 2 {
 			// Set value to the default.
 			v = keyAndDefault[1]
-			if (strings.HasPrefix(v, "$")) {
+			if strings.HasPrefix(v, "$") {
 				v = os.Getenv(v[1:])
 			}
 		}
@@ -87,5 +86,3 @@ func expandEnv(config []byte) []byte {
 		return v
 	}))
 }
-
-

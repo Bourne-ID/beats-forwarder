@@ -1,22 +1,22 @@
 package forwarder
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
-	"encoding/json"
-	"bytes"
 	"time"
 
-	"github.com/elastic/go-lumber/server"
-	"github.com/Sirupsen/logrus"
-	"github.com/Bourne-ID/beats-forwarder/output"
 	cfg "github.com/Bourne-ID/beats-forwarder/config"
+	"github.com/Bourne-ID/beats-forwarder/output"
+	"github.com/Sirupsen/logrus"
+	"github.com/elastic/go-lumber/server"
 
 	"crypto/tls"
-	"io/ioutil"
 	"crypto/x509"
 	"errors"
+	"io/ioutil"
 )
 
 var Registry map[string]output.Output
@@ -52,7 +52,6 @@ func Run(config *cfg.Config) error {
 		return err
 	}
 
-
 	// todo (gpolaert) factorize
 	input_port := 5044
 	input_host := "0.0.0.0"
@@ -85,15 +84,13 @@ func Run(config *cfg.Config) error {
 		input_timeout = *config.Input.Timeout
 	}
 
-
-
 	// start the listener
 	local, err := server.ListenAndServe(
 		fmt.Sprintf("%s:%d", input_host, input_port),
 		server.V1(input_lj_v1),
 		server.V2(input_lj_v2),
-		server.Keepalive(time.Duration(input_keepalive) * time.Second),
-		server.Timeout(time.Duration(input_timeout) * time.Second),
+		server.Keepalive(time.Duration(input_keepalive)*time.Second),
+		server.Timeout(time.Duration(input_timeout)*time.Second),
 		server.TLS(getTLSConfig(config)))
 
 	if err != nil {
@@ -109,7 +106,6 @@ func Run(config *cfg.Config) error {
 		_ = local.Close()
 		os.Exit(0)
 	}()
-
 
 	// main loop
 	for batch := range local.ReceiveChan() {
@@ -132,7 +128,7 @@ func Run(config *cfg.Config) error {
 
 func getTLSConfig(config *cfg.Config) *tls.Config {
 
-	if (*config.Input.TlsConfig.Enable == true) {
+	if *config.Input.TlsConfig.Enable == true {
 
 		tlsConfig := &tls.Config{}
 		logrus.Infof("Setting an encrypted communication for the input")
@@ -163,5 +159,3 @@ func getTLSConfig(config *cfg.Config) *tls.Config {
 	return nil
 
 }
-
-

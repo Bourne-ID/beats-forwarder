@@ -1,8 +1,8 @@
 package output
 
 import (
-	cfg "github.com/Bourne-ID/beats-forwarder/config"
 	"errors"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
 )
 
 type LogmaticClient struct {
@@ -12,12 +12,12 @@ type LogmaticClient struct {
 
 func (c *LogmaticClient) Init(config *cfg.Config) error {
 
-	if (config.Output.Logmatic.Key == nil || *config.Output.Logmatic.Key == "" ) {
+	if config.Output.Logmatic.Key == nil || *config.Output.Logmatic.Key == "" {
 		return errors.New("No Logmatic API Key provided.")
 	}
 	c.logmaticAPIKey = *config.Output.Logmatic.Key + " "
 
-	if (config.Output.Logmatic.Network == nil || config.Output.Logmatic.Raddr == nil) {
+	if config.Output.Logmatic.Network == nil || config.Output.Logmatic.Raddr == nil {
 		return errors.New("Logmatic configuration missing.")
 	}
 
@@ -29,11 +29,11 @@ func (c *LogmaticClient) Init(config *cfg.Config) error {
 	return nil
 }
 
-func (c *LogmaticClient) WriteAndRetry(payload []byte) (error) {
+func (c *LogmaticClient) WriteAndRetry(payload []byte) error {
 	return c.socket.WriteAndRetry(append([]byte(c.logmaticAPIKey), payload...))
 }
 
-func (c *LogmaticClient) Connect() (error) {
+func (c *LogmaticClient) Connect() error {
 	return c.socket.Connect()
 }
 

@@ -1,16 +1,16 @@
 package output
 
 import (
-	cfg "github.com/Bourne-ID/beats-forwarder/config"
-	"errors"
 	"bytes"
-	"net/http"
-	"github.com/Graylog2/go-gelf/gelf"
-	"time"
 	"encoding/json"
-	"log"
-	"reflect"
+	"errors"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
+	"github.com/Graylog2/go-gelf/gelf"
 	"github.com/Sirupsen/logrus"
+	"log"
+	"net/http"
+	"reflect"
+	"time"
 )
 
 type HTTPGelfClient struct {
@@ -19,7 +19,7 @@ type HTTPGelfClient struct {
 
 func (c *HTTPGelfClient) Init(config *cfg.Config) error {
 
-	if (config.Output.HTTPGelf.Endpoint == nil || *config.Output.HTTPGelf.Endpoint == "" ) {
+	if config.Output.HTTPGelf.Endpoint == nil || *config.Output.HTTPGelf.Endpoint == "" {
 		return errors.New("No endpoint URL provided.")
 	}
 	c.endpoint = *config.Output.HTTPGelf.Endpoint
@@ -27,7 +27,7 @@ func (c *HTTPGelfClient) Init(config *cfg.Config) error {
 	return nil
 }
 
-func (c *HTTPGelfClient) WriteAndRetry(payload []byte) (error) {
+func (c *HTTPGelfClient) WriteAndRetry(payload []byte) error {
 
 	//payload should be uncompressed BEATS JSON.
 	//I'm sure there's a better way of doing this, but I'm going to use the method being used in Graylog BEATS importing.
@@ -71,22 +71,21 @@ func (c *HTTPGelfClient) WriteAndRetry(payload []byte) (error) {
 	return nil
 }
 
-func parseFilebeat(jsonMap map[string]interface{}) (gelf.Message) {
+func parseFilebeat(jsonMap map[string]interface{}) gelf.Message {
 	messageString := jsonMap["message"].(string)
-	gelfMessage := CreateMessage(messageString, jsonMap);
-
+	gelfMessage := CreateMessage(messageString, jsonMap)
 
 	gelfMessage.Extra["_facility"] = "filebeat"
 	gelfMessage.Extra["_file"] = jsonMap["source"]
 	gelfMessage.Extra["_input_type"] = jsonMap["input_type"]
 	gelfMessage.Extra["_count"] = jsonMap["count"]
 	gelfMessage.Extra["_offset"] = jsonMap["offset"]
-	gelfMessage.Extra["_fields"] =jsonMap["fields"]
+	gelfMessage.Extra["_fields"] = jsonMap["fields"]
 
 	return gelfMessage
 }
 
-func parseWinlogbeat(jsonMap map[string]interface{}) (gelf.Message) {
+func parseWinlogbeat(jsonMap map[string]interface{}) gelf.Message {
 	message := jsonMap["message"].(string)
 	gelfMessage := CreateMessage(message, jsonMap)
 
@@ -99,10 +98,10 @@ func parseWinlogbeat(jsonMap map[string]interface{}) (gelf.Message) {
 		gelfMessage.Extra["_"+k] = v
 	}
 
-	return gelfMessage;
+	return gelfMessage
 }
 
-func parseGenericBeat(jsonMap map[string]interface{}) (gelf.Message) {
+func parseGenericBeat(jsonMap map[string]interface{}) gelf.Message {
 	message := jsonMap["message"].(string)
 	gelfMessage := CreateMessage(message, jsonMap)
 	gelfMessage.Facility = "genericBeat"
@@ -114,10 +113,10 @@ func parseGenericBeat(jsonMap map[string]interface{}) (gelf.Message) {
 	}
 	logrus.Info(gelfMessage)
 
-	return gelfMessage;
+	return gelfMessage
 }
 
-func CreateMessage(message string, jsonMap map[string]interface{}) (gelf.Message){
+func CreateMessage(message string, jsonMap map[string]interface{}) gelf.Message {
 	beat := jsonMap["beat"]
 	hostname := "unknown"
 	name := "unknown"
@@ -150,10 +149,10 @@ func CreateMessage(message string, jsonMap map[string]interface{}) (gelf.Message
 		Extra:    extra,
 	}
 
-return m
+	return m
 }
 
-func (c *HTTPGelfClient) Connect() (error) {
+func (c *HTTPGelfClient) Connect() error {
 	return nil
 }
 
@@ -171,7 +170,7 @@ func FlattenPrefixed(value interface{}, prefix string) map[string]interface{} {
 func FlattenPrefixedToResult(value interface{}, prefix string, m map[string]interface{}) {
 	base := ""
 	if prefix != "" {
-		base = prefix+"_"
+		base = prefix + "_"
 	}
 
 	original := reflect.ValueOf(value)

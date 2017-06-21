@@ -1,9 +1,9 @@
 package output
 
 import (
-	cfg "github.com/Bourne-ID/beats-forwarder/config"
-	"errors"
 	"bytes"
+	"errors"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
 	"net/http"
 )
 
@@ -13,7 +13,7 @@ type HTTPClient struct {
 
 func (c *HTTPClient) Init(config *cfg.Config) error {
 
-	if (config.Output.HTTP.Endpoint == nil || *config.Output.HTTP.Endpoint == "" ) {
+	if config.Output.HTTP.Endpoint == nil || *config.Output.HTTP.Endpoint == "" {
 		return errors.New("No endpoint URL provided.")
 	}
 	c.endpoint = *config.Output.HTTP.Endpoint
@@ -21,7 +21,7 @@ func (c *HTTPClient) Init(config *cfg.Config) error {
 	return nil
 }
 
-func (c *HTTPClient) WriteAndRetry(payload []byte) (error) {
+func (c *HTTPClient) WriteAndRetry(payload []byte) error {
 
 	req, err := http.NewRequest("POST", c.endpoint, bytes.NewBuffer(payload))
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *HTTPClient) WriteAndRetry(payload []byte) (error) {
 
 }
 
-func (c *HTTPClient) Connect() (error) {
+func (c *HTTPClient) Connect() error {
 	return nil
 }
 

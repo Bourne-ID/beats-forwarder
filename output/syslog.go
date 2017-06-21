@@ -13,7 +13,7 @@ func (c *SyslogClient) Init(config *cfg.Config) error {
 
 	network := config.Output.Syslog.Network
 
-	if (network != nil && (*network == "tcp" || *network == "udp")) {
+	if network != nil && (*network == "tcp" || *network == "udp") {
 		c.writer, _ = gsyslog.DialLogger(*network, *config.Output.Syslog.Raddr, gsyslog.LOG_INFO, "LOCAL0", *config.Output.Syslog.Tag)
 	} else {
 		c.writer, _ = gsyslog.NewLogger(gsyslog.LOG_INFO, "LOCAL0", *config.Output.Syslog.Tag)
@@ -23,12 +23,12 @@ func (c *SyslogClient) Init(config *cfg.Config) error {
 
 }
 
-func (c *SyslogClient) WriteAndRetry(payload []byte) (error) {
+func (c *SyslogClient) WriteAndRetry(payload []byte) error {
 	_, err := c.writer.Write(payload)
 	return err
 }
 
-func (c *SyslogClient) Connect() (error) {
+func (c *SyslogClient) Connect() error {
 	return nil
 }
 

@@ -2,22 +2,22 @@ package output
 
 import (
 	"fmt"
-	"time"
 	"math"
-	"sync"
 	"net"
+	"sync"
+	"time"
 
 	"crypto/tls"
-	"io/ioutil"
 	"crypto/x509"
+	"io/ioutil"
 
-	"github.com/Sirupsen/logrus"
 	cfg "github.com/Bourne-ID/beats-forwarder/config"
+	"github.com/Sirupsen/logrus"
 )
 
 type Connection interface {
-	Write([] byte) (int, error)
-	Close() (error)
+	Write([]byte) (int, error)
+	Close() error
 }
 
 type SocketClient struct {
@@ -25,8 +25,8 @@ type SocketClient struct {
 	config    *SocketConfig
 	tlsConfig *tls.Config
 
-	network   string
-	raddr     string
+	network string
+	raddr   string
 }
 
 type SocketConfig struct {
@@ -40,7 +40,7 @@ func (c *SocketClient) Init(config *cfg.Config) error {
 	c.raddr = *config.Output.UDPTCP.Raddr
 	c.config = &SocketConfig{maxBackoff: 30, maxRetries: 10}
 
-	if (*config.Output.UDPTCP.TlsConfig.Enable == true) {
+	if *config.Output.UDPTCP.TlsConfig.Enable == true {
 
 		c.network = "tcp"
 		// load client cert
@@ -72,39 +72,39 @@ func (c *SocketClient) Init(config *cfg.Config) error {
 	return nil
 }
 
-func (socket *SocketClient) Connect() (error) {
+func (socket *SocketClient) Connect() error {
 
 	logrus.Infof("Connection to %s (%s)\n", socket.raddr, socket.network)
 
 	var conn Connection
 	var err error
-	if (socket.network == "tls" || socket.network == "ssl") {
+	if socket.network == "tls" || socket.network == "ssl" {
 		conn, err = tls.Dial("tcp", socket.raddr, socket.tlsConfig)
 
 	} else {
 		conn, err = net.Dial(socket.network, socket.raddr)
 
 	}
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
-	socket.conn = conn;
+	socket.conn = conn
 	return nil
 }
 
-func (socket *SocketClient) reconnect() (error) {
+func (socket *SocketClient) reconnect() error {
 	socket.Close()
 	return socket.Connect()
 }
 
-func (socket *SocketClient) WriteAndRetry(payload []byte) (error) {
+func (socket *SocketClient) WriteAndRetry(payload []byte) error {
 
 	for i := 0; i < socket.config.maxRetries; i++ {
 
 		// backoff mechanism
-		backoffTime := int(math.Min(math.Pow(float64(i), 2), float64(socket.config.maxBackoff)));
-		if (backoffTime > 0) {
-			logrus.Warnf("Making a new attempt in %d seconds (%d/%d)", backoffTime, i, socket.config.maxRetries);
+		backoffTime := int(math.Min(math.Pow(float64(i), 2), float64(socket.config.maxBackoff)))
+		if backoffTime > 0 {
+			logrus.Warnf("Making a new attempt in %d seconds (%d/%d)", backoffTime, i, socket.config.maxRetries)
 		}
 
 		time.Sleep(time.Duration(backoffTime) * time.Second)
@@ -112,18 +112,17 @@ func (socket *SocketClient) WriteAndRetry(payload []byte) (error) {
 		mutex := sync.Mutex{}
 		mutex.Lock()
 
-		if (socket.conn == nil) {
+		if socket.conn == nil {
 
 			// reconnect
-			err := socket.reconnect();
+			err := socket.reconnect()
 			if err != nil {
 				logrus.Errorf("Unable to connect, error: %v", err)
 				socket.Close()
 				continue
 			}
 		}
-		mutex.Unlock();
-
+		mutex.Unlock()
 
 		err := socket.writeOnce(payload)
 		if err != nil {
@@ -138,7 +137,7 @@ func (socket *SocketClient) WriteAndRetry(payload []byte) (error) {
 	return fmt.Errorf("Failed to connect to %s (%s)", socket.raddr, socket.network)
 }
 
-func (socket *SocketClient) writeOnce(payload []byte) (error) {
+func (socket *SocketClient) writeOnce(payload []byte) error {
 
 	_, err := socket.conn.Write(payload)
 	if err != nil {
