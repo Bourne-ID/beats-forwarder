@@ -55,10 +55,15 @@ type OutputLogmaticConfig struct {
 type OutputHTTPConfig struct {
 	Endpoint *string
 }
+
+type OutputHTTPGelfConfig struct {
+	Endpoint *string
+}
 type OutputConfig struct {
-	Type     *string
-	UDPTCP   OutputUdpTcpConfig       `config:"udp_tcp"`
-	Syslog   OutputSyslogConfig       `config:"syslog"`
-	Logmatic OutputLogmaticConfig     `config:"logmatic"`
-	HTTP     OutputHTTPConfig         `config:"http"`
+	Type     	*string
+	UDPTCP   	OutputUdpTcpConfig       `config:"udp_tcp"`
+	Syslog   	OutputSyslogConfig       `config:"syslog"`
+	Logmatic 	OutputLogmaticConfig     `config:"logmatic"`
+	HTTP     	OutputHTTPConfig         `config:"http"`
+	HTTPGelf     	OutputHTTPGelfConfig     `config:"httpgelf"`
 }

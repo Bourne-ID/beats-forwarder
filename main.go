@@ -2,8 +2,8 @@ package main
 
 import (
 	"os"
-	"github.com/logmatic/beats-forwarder/forwarder"
-	cfg "github.com/logmatic/beats-forwarder/config"
+	"github.com/Bourne-ID/beats-forwarder/forwarder"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
 	"github.com/Sirupsen/logrus"
 	"flag"
 )

@@ -1,6 +1,6 @@
 package output
 
-import cfg "github.com/logmatic/beats-forwarder/config"
+import cfg "github.com/Bourne-ID/beats-forwarder/config"
 
 // Interface that all outputs should be implemented
 type Output  interface {

@@ -1,7 +1,7 @@
 package output
 
 import (
-	cfg "github.com/logmatic/beats-forwarder/config"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
 	"github.com/hashicorp/go-syslog"
 )
 

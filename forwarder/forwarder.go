@@ -10,8 +10,8 @@ import (
 
 	"github.com/elastic/go-lumber/server"
 	"github.com/Sirupsen/logrus"
-	"github.com/logmatic/beats-forwarder/output"
-	cfg "github.com/logmatic/beats-forwarder/config"
+	"github.com/Bourne-ID/beats-forwarder/output"
+	cfg "github.com/Bourne-ID/beats-forwarder/config"
 
 	"crypto/tls"
 	"io/ioutil"
@@ -28,6 +28,7 @@ func init() {
 	Registry["logmatic"] = &output.LogmaticClient{}
 	Registry["udp_tcp"] = &output.SocketClient{}
 	Registry["http"] = &output.HTTPClient{}
+	Registry["httpgelf"] = &output.HTTPGelfClient{}
 
 }
 
