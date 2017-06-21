@@ -118,7 +118,7 @@ func Run(config *cfg.Config) error {
 			json.NewEncoder(payload).Encode(beat)
 			//check for error
 			err := remote.WriteAndRetry(payload.Bytes())
-			if (err != nil) {
+			if err != nil {
 				logrus.Warn("Write and Retry failed\n", err)
 			}
 		}

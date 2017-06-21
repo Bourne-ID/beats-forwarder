@@ -56,7 +56,7 @@ type OutputHTTPConfig struct {
 }
 
 type OutputHTTPGelfConfig struct {
-	Endpoint *string
+	Endpoint    *string
 	Fingerprint *string
 }
 type OutputConfig struct {

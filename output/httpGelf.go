@@ -4,21 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	cfg "github.com/Bourne-ID/beats-forwarder/config"
+	"github.com/Bourne-ID/golang-tofu"
 	"github.com/Graylog2/go-gelf/gelf"
 	"github.com/Sirupsen/logrus"
 	"log"
 	"net/http"
 	"reflect"
-	"time"
-	"github.com/Bourne-ID/golang-tofu"
 	"strings"
-	"fmt"
+	"time"
 )
 
-
 type HTTPGelfClient struct {
-	endpoint string
+	endpoint    string
 	fingerprint string
 }
 
@@ -66,17 +65,17 @@ func (c *HTTPGelfClient) WriteAndRetry(payload []byte) error {
 
 	var client *http.Client
 
-	if (strings.Contains(strings.ToLower(c.endpoint), "https") && c.fingerprint != "") {
+	if strings.Contains(strings.ToLower(c.endpoint), "https") && c.fingerprint != "" {
 		//caching the certificate would probably be a better approach here.
 		ipPort := strings.Replace(c.endpoint, "https://", "", 1)
 		details, err := tofu.GetFingerprints(ipPort)
-		if (err != nil) {
+		if err != nil {
 			return err
 		}
 
 		serverFingerprint := details[0].Fingerprint
 
-		if (strings.Compare(serverFingerprint, c.fingerprint) == 0) {
+		if strings.Compare(serverFingerprint, c.fingerprint) == 0 {
 			return errors.New(fmt.Sprintf("User fingerprint %s did not match server fingerprint %s", strings.ToUpper(c.fingerprint), strings.ToUpper(serverFingerprint)))
 		}
 

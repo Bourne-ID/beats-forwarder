@@ -5,9 +5,9 @@ import (
 	cfg "github.com/Bourne-ID/beats-forwarder/config"
 	"github.com/Bourne-ID/beats-forwarder/forwarder"
 	"github.com/Sirupsen/logrus"
+	"log"
 	"os"
 	"path"
-	"log"
 )
 
 var config = cfg.Config{}
@@ -21,7 +21,9 @@ func main() {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 	ex, err := os.Executable()
-	if err != nil { log.Fatal(err) }
+	if err != nil {
+		log.Fatal(err)
+	}
 	dir := path.Dir(ex)
 
 	var f *os.File
