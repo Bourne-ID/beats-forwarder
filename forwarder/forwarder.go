@@ -116,7 +116,11 @@ func Run(config *cfg.Config) error {
 		for _, beat := range batch.Events {
 			payload.Reset()
 			json.NewEncoder(payload).Encode(beat)
-			remote.WriteAndRetry(payload.Bytes())
+			//check for error
+			err := remote.WriteAndRetry(payload.Bytes())
+			if (err != nil) {
+				logrus.Warn("Write and Retry failed\n", err)
+			}
 		}
 		batch.ACK()
 

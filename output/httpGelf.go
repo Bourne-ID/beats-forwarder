@@ -11,10 +11,15 @@ import (
 	"net/http"
 	"reflect"
 	"time"
+	"github.com/Bourne-ID/golang-tofu"
+	"strings"
+	"fmt"
 )
+
 
 type HTTPGelfClient struct {
 	endpoint string
+	fingerprint string
 }
 
 func (c *HTTPGelfClient) Init(config *cfg.Config) error {
@@ -22,6 +27,11 @@ func (c *HTTPGelfClient) Init(config *cfg.Config) error {
 	if config.Output.HTTPGelf.Endpoint == nil || *config.Output.HTTPGelf.Endpoint == "" {
 		return errors.New("No endpoint URL provided.")
 	}
+
+	if config.Output.HTTPGelf.Fingerprint != nil && *config.Output.HTTPGelf.Fingerprint != "" {
+		c.fingerprint = *config.Output.HTTPGelf.Fingerprint
+	}
+
 	c.endpoint = *config.Output.HTTPGelf.Endpoint
 
 	return nil
@@ -54,6 +64,30 @@ func (c *HTTPGelfClient) WriteAndRetry(payload []byte) error {
 
 	gelfMessage.MarshalJSONBuf(&buf)
 
+	var client *http.Client
+
+	if (strings.Contains(strings.ToLower(c.endpoint), "https") && c.fingerprint != "") {
+		//caching the certificate would probably be a better approach here.
+		ipPort := strings.Replace(c.endpoint, "https://", "", 1)
+		details, err := tofu.GetFingerprints(ipPort)
+		if (err != nil) {
+			return err
+		}
+
+		serverFingerprint := details[0].Fingerprint
+
+		if (strings.Compare(serverFingerprint, c.fingerprint) == 0) {
+			return errors.New(fmt.Sprintf("User fingerprint %s did not match server fingerprint %s", strings.ToUpper(c.fingerprint), strings.ToUpper(serverFingerprint)))
+		}
+
+		client, err = tofu.GetTofuClient(serverFingerprint)
+		if err != nil {
+			return err
+		}
+	} else {
+		client = &http.Client{}
+	}
+
 	req, err := http.NewRequest("POST", c.endpoint, &buf)
 	if err != nil {
 		return err
@@ -61,7 +95,6 @@ func (c *HTTPGelfClient) WriteAndRetry(payload []byte) error {
 
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
 	_, err = client.Do(req)
 
 	if err != nil {
