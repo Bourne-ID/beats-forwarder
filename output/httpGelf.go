@@ -86,7 +86,10 @@ func parseFilebeat(jsonMap map[string]interface{}) gelf.Message {
 }
 
 func parseWinlogbeat(jsonMap map[string]interface{}) gelf.Message {
-	message := jsonMap["message"].(string)
+	message := "Win Event Message Not Set"
+	if jsonMap["message"] != nil {
+		message = jsonMap["message"].(string)
+	}
 	gelfMessage := CreateMessage(message, jsonMap)
 
 	gelfMessage.Facility = "winlogbeat"
