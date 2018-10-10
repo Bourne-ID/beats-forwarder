@@ -75,7 +75,7 @@ func (c *HTTPGelfClient) WriteAndRetry(payload []byte) error {
 
 		serverFingerprint := details[0].Fingerprint
 
-		if strings.Compare(serverFingerprint, c.fingerprint) == 0 {
+		if strings.Compare(serverFingerprint, c.fingerprint) != 0 {
 			return errors.New(fmt.Sprintf("User fingerprint %s did not match server fingerprint %s", strings.ToUpper(c.fingerprint), strings.ToUpper(serverFingerprint)))
 		}
 
@@ -167,7 +167,14 @@ func CreateMessage(message string, jsonMap map[string]interface{}) gelf.Message 
 		timestamp = float64(t.Unix())
 	}
 
-	typeString := jsonMap["type"].(string)
+	var typeString string;
+	if jsonMap["type"] == nil {
+		//could be the update where everything is now in fields
+		fields := jsonMap["fields"]
+		typeString = fields.(map[string]interface{})["type"].(string)
+	} else {
+		typeString = jsonMap["type"].(string)
+	}
 
 	extra := map[string]interface{}{
 		"_tags": jsonMap["tags"],
